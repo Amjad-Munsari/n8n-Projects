@@ -1,0 +1,948 @@
+{
+  "name": "STEP 2.1 - Send HP Design & Get Feedback",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Name",
+              "lookupValue": "={{ $json.Name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -224,
+        16
+      ],
+      "id": "abbd692a-8809-447b-8a3b-a493915aa9df",
+      "name": "Get Client's Email"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "HP_Design_Approved": "YES",
+            "Email": "={{ $('Get Client\\'s Email').item.json.Email }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quote_ID",
+              "displayName": "Quote_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Trello_Card_ID",
+              "displayName": "Trello_Card_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Number",
+              "displayName": "1st_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Paid",
+              "displayName": "1st_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DQ_Form_Submitted",
+              "displayName": "DQ_Form_Submitted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website_Link",
+              "displayName": "Website_Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HP_Design_Approved",
+              "displayName": "HP_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Design_Approved",
+              "displayName": "Final_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Number",
+              "displayName": "2nd_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "2nd_Invoice_Paid",
+              "displayName": "2nd_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Website_Approved",
+              "displayName": "Final_Website_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Number",
+              "displayName": "Final_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Final_Invoice_Paid",
+              "displayName": "Final_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        -80
+      ],
+      "id": "55d9ec1e-0b6b-447e-8af7-5b6297827483",
+      "name": "Update HP Status"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "HP_Design_Approved": "NO",
+            "Email": "={{ $('Get Client\\'s Email').item.json.Email }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quote_ID",
+              "displayName": "Quote_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Trello_Card_ID",
+              "displayName": "Trello_Card_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Number",
+              "displayName": "1st_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Paid",
+              "displayName": "1st_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DQ_Form_Submitted",
+              "displayName": "DQ_Form_Submitted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website_Link",
+              "displayName": "Website_Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HP_Design_Approved",
+              "displayName": "HP_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Design_Approved",
+              "displayName": "Final_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Number",
+              "displayName": "2nd_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "2nd_Invoice_Paid",
+              "displayName": "2nd_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Website_Approved",
+              "displayName": "Final_Website_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Number",
+              "displayName": "Final_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Final_Invoice_Paid",
+              "displayName": "Final_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        112
+      ],
+      "id": "799a2af4-85e7-4658-8f93-1d501f8c05bb",
+      "name": "Update HP Status."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "af42b91f-54e7-4d98-b9bf-03fce89b8288",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        16
+      ],
+      "id": "0bd5bc11-0e41-4e9a-8f6d-2bdda3433575",
+      "name": "Approved?"
+    },
+    {
+      "parameters": {
+        "toRecipients": "ian@internetcreation.net,mike@internetcreation.net",
+        "subject": "Home Page Design Update",
+        "bodyContent": "=Your Client {{ $('Get Client\\'s Email').item.json.Name }} approved the home page design.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        896,
+        -80
+      ],
+      "id": "e0de7396-2c4e-4bce-9883-5f60f4c512c2",
+      "name": "Notify Team",
+      "webhookId": "9a2413a8-ba2c-441d-92e0-c76745255977"
+    },
+    {
+      "parameters": {
+        "toRecipients": "ian@internetcreation.net,mike@internetcreation.net",
+        "subject": "Home Page Design Update",
+        "bodyContent": "=Your Client {{ $('Get Client\\'s Email').item.json.Name }} didn't approve the home page design.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        896,
+        112
+      ],
+      "id": "8f39f578-3b72-4329-a98c-809d66f77123",
+      "name": "Notify Team.",
+      "webhookId": "ff8b0aa7-847d-4deb-a746-d9cbe7e66720"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": {
+          "__rl": true,
+          "value": "={{ $('Get Client\\'s Email').item.json.Trello_Card_ID }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "idList": "68c7d7f6447a4fd80b4a92bc"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -80
+      ],
+      "id": "f93dafec-5642-4cf8-8077-469b67751448",
+      "name": "Move Card to \"Other Pages Design\""
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": {
+          "__rl": true,
+          "value": "={{ $('Get Client\\'s Email').item.json.Trello_Card_ID }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "idList": "68c7d7f19e056e27e6c29b94"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        112
+      ],
+      "id": "014bd840-5b98-40ce-be52-57f9760d4b99",
+      "name": "Move Card to \"Home Page Design\""
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "toRecipients": "={{ $('Get Client\\'s Email').item.json.Email }}",
+        "subject": "Home Page Design Update",
+        "message": "=<p style=\"margin-bottom:20px;\">We're excited to share the first version of the homepage design for your new website.</p>\n\n<p style=\"margin-bottom:20px;\"><a href=\"{{ $('Get Client\\'s Email').item.json.Website_Link }}\">View Your Homepage Design</a></p>\n\n<p style=\"margin-bottom:20px;\">As you take a look, try to focus on the overall look and feel rather than the small details. At this stage, we're primarily ensuring the direction feels right before we proceed to refinements.</p>\n\n<p style=\"margin-bottom:20px;\"><strong>A few things you might like to think about while reviewing:</strong></p>\n\n<p style=\"margin-bottom:10px;\">• Does it feel like your brand?</p>\n<p style=\"margin-bottom:10px;\">• Do the colours, fonts, and layout feel right for your business?</p>\n<p style=\"margin-bottom:10px;\">• Is the page straightforward to understand at a glance?</p>\n<p style=\"margin-bottom:20px;\">• Does everything flow nicely as you scroll down?</p>\n\n<p style=\"margin-bottom:20px;\">It can also help to imagine you're a first-time visitor seeing your website for the first time and think about how clearly your message comes across.</p>\n\n<p style=\"margin-bottom:20px;\">When it comes to feedback, clear and specific comments are always helpful — what you like, what you're unsure about, or anything you'd like adjusted. And if something doesn't quite feel right but you can't put your finger on why, that's totally okay to say too.</p>\n\n<p style=\"margin-bottom:20px;\">No need to worry about final wording, images, or minor spacing tweaks just yet — we'll look at those once the overall structure and style are locked in.</p>\n\n<p style=\"margin-bottom:20px;\">Once you've had a chance to review, feel free to send your feedback either through email or reach out to arrange a meeting.</p>\n\n<p style=\"margin-bottom:20px;\">If you have any questions while reviewing, please let us know — we're here to help.</p>\n\n<p>Looking forward to hearing what you think!</p>",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "buttonDisapprovalStyle": "primary"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        224,
+        16
+      ],
+      "id": "26415199-a93a-40fc-b970-8c904c92939d",
+      "name": "Send design to client",
+      "webhookId": "dacaaf04-2cbc-4981-a601-ffd4118b1f7a"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "start-home-page",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -672,
+        16
+      ],
+      "id": "a2d6af04-138f-4ef1-96e3-ad222ba63ef9",
+      "name": "Start HP Design Workflow",
+      "webhookId": "b01fe06c-6893-440d-ad22-274d0befe29a"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.query.Name }}",
+            "Website_Link": "={{ $json.query.Description }}"
+          },
+          "matchingColumns": [
+            "Name"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quote_ID",
+              "displayName": "Quote_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Trello_Card_ID",
+              "displayName": "Trello_Card_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Number",
+              "displayName": "1st_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Paid",
+              "displayName": "1st_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DQ_Form_Submitted",
+              "displayName": "DQ_Form_Submitted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website_Link",
+              "displayName": "Website_Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HP_Design_Approved",
+              "displayName": "HP_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Design_Approved",
+              "displayName": "Final_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Number",
+              "displayName": "2nd_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Paid",
+              "displayName": "2nd_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Website_Approved",
+              "displayName": "Final_Website_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Number",
+              "displayName": "Final_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Paid",
+              "displayName": "Final_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -448,
+        16
+      ],
+      "id": "fc244a0f-a3e7-43da-84f8-a24a5bd0e499",
+      "name": "Append or update row in sheet"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/home-page-reminder",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Email",
+              "value": "={{ $json.Email }}"
+            },
+            {
+              "name": "Name",
+              "value": "={{ $json.Name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        16
+      ],
+      "id": "e836e747-af50-4163-a50a-41957afd3726",
+      "name": "Start Email Reminder"
+    }
+  ],
+  "pinData": {
+    "Start HP Design Workflow": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.12.0",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9b06aebe947a65ac-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 172.69.151.22",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-p9t9g",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "Name": "ian paltiel (gmail)",
+            "Description": "https://internetcreation.net"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/start-home-page",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Get Client's Email": {
+      "main": [
+        [
+          {
+            "node": "Start Email Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update HP Status": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update HP Status.": {
+      "main": [
+        [
+          {
+            "node": "Notify Team.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Update HP Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update HP Status.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team": {
+      "main": [
+        [
+          {
+            "node": "Move Card to \"Other Pages Design\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team.": {
+      "main": [
+        [
+          {
+            "node": "Move Card to \"Home Page Design\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send design to client": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start HP Design Workflow": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Get Client's Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Email Reminder": {
+      "main": [
+        [
+          {
+            "node": "Send design to client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d9ba7023-2454-4c7c-a6df-9592672c0be4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2e806d8e779904fee169c37d64bf24a4176529c6bae3ae97397462d403b79ca2"
+  },
+  "id": "JAJFfadZWBvlC1hs",
+  "tags": []
+}

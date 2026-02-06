@@ -1,0 +1,1225 @@
+{
+  "name": "2nd Invoice Reminder Loop",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "second-invoice",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1056,
+        -304
+      ],
+      "id": "7aff1a91-4bbe-44b2-8e05-0534e2d4a99f",
+      "name": "Webhook",
+      "webhookId": "a9fbb86d-6ce5-4ecd-bfc5-a5da76fd9348"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input number from the previous node\nconst inputNumber = $('XERO : Get Quote').first().json.Quotes[0].Total;\n\n// Calculate 30% and round to nearest decimal\nconst result = Math.round(inputNumber * 0.2 * 10) / 10;\n\n// Return the result\nreturn {\n  json: {\n    original: inputNumber,\n    twentyPercent: result\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -608,
+        -304
+      ],
+      "id": "f0d44d8b-060d-4d2c-9538-8c54b8843bd7",
+      "name": "Calculate 20% Invoice"
+    },
+    {
+      "parameters": {
+        "organizationId": "16ef3553-1ccc-4b16-b9cd-8dd77f822653",
+        "type": "ACCREC",
+        "contactId": "={{ $('XERO : Get Quote').item.json.Quotes[0].Contact.ContactID }}",
+        "lineItemsUi": {
+          "lineItemsValues": [
+            {
+              "description": "Description",
+              "unitAmount": "={{ $json.twentyPercent }}",
+              "itemCode": "=",
+              "accountCode": "101",
+              "taxType": "=OUTPUT2"
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.xero",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        -304
+      ],
+      "id": "279861ee-d418-4925-bb6c-b632761c6968",
+      "name": "Create 20% Invoice"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "916cc07e-6976-43da-b27d-d0e432c97552",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "PAID",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -608,
+        416
+      ],
+      "id": "8b493d8e-b949-43d0-ab62-1f86118d8a30",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 15,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -384,
+        512
+      ],
+      "id": "8c906100-997c-4fcb-a268-9415d8f072a4",
+      "name": "Wait 15 Min",
+      "webhookId": "6d4e2795-eb0b-475b-8f09-2817f75a16c0"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "2nd_Invoice_Paid": "YES",
+            "Email": "={{ $('Check Invoice Status').item.json.query.Email }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quote_ID",
+              "displayName": "Quote_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Trello_Card_ID",
+              "displayName": "Trello_Card_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "1st_Invoice_Number",
+              "displayName": "1st_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "1st_Invoice_Paid",
+              "displayName": "1st_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DQ_Form_Submitted",
+              "displayName": "DQ_Form_Submitted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Website_Link",
+              "displayName": "Website_Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HP_Design_Approved",
+              "displayName": "HP_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Final_Design_Approved",
+              "displayName": "Final_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "2nd_Invoice_Number",
+              "displayName": "2nd_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "2nd_Invoice_Paid",
+              "displayName": "2nd_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Final_Website_Approved",
+              "displayName": "Final_Website_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Final_Invoice_Number",
+              "displayName": "Final_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Final_Invoice_Paid",
+              "displayName": "Final_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -384,
+        320
+      ],
+      "id": "ec661abf-9feb-4c8d-9d6f-2297c33d1a90",
+      "name": "Update Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bfced571-2306-42c2-bb17-228dcac5b324",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "PAID",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -384,
+        -48
+      ],
+      "id": "439ec5a4-501e-414a-a87e-de150ca85b34",
+      "name": "Invoice Paid?"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Email Reminder').item.json.query.Email }}",
+        "subject": "Invoice Reminder",
+        "bodyContent": "Dear Client,\n\nThis is a reminder to pay the invoice.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        32
+      ],
+      "id": "e05c81d2-b850-4f5f-95ea-5ae3888acbd8",
+      "name": "Send Reminder",
+      "webhookId": "3a271f04-f145-42e2-802b-4d0b44db2a08"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "second-invoice-reminder",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1056,
+        32
+      ],
+      "id": "79481f61-b95d-4266-a85a-758a5da5ad22",
+      "name": "Email Reminder",
+      "webhookId": "4c7748b1-12d9-4f7b-b58f-e6ea321e4665"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "second-invoice-status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1056,
+        416
+      ],
+      "id": "eb8cf8ef-4cb5-4b2a-82d7-dc0c0a2bbb3f",
+      "name": "Check Invoice Status",
+      "webhookId": "3b94ecbb-8fb0-4dcb-9a1c-eb00db31ab66"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "organizationId": "16ef3553-1ccc-4b16-b9cd-8dd77f822653",
+        "invoiceId": "={{ $('Email Reminder').item.json.query.InvoiceNumber }}"
+      },
+      "type": "n8n-nodes-base.xero",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        -48
+      ],
+      "id": "7ddc17f5-49cf-4911-b784-a0fe9693d14b",
+      "name": "Get invoice"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "organizationId": "16ef3553-1ccc-4b16-b9cd-8dd77f822653",
+        "invoiceId": "={{ $('Check Invoice Status').item.json.query.InvoiceNumber }}"
+      },
+      "type": "n8n-nodes-base.xero",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        416
+      ],
+      "id": "f33df43a-651c-4948-9764-c3216a5579e7",
+      "name": "Get invoice."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/second-invoice-reminder",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "InvoiceNumber",
+              "value": "={{ $json['2nd_Invoice_Number'] }}"
+            },
+            {
+              "name": "Email",
+              "value": "={{ $json['Email'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        -400
+      ],
+      "id": "042537a1-e98d-4641-bae7-f57694ebe980",
+      "name": "Start Reminder"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/second-invoice-status",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "InvoiceNumber",
+              "value": "={{ $json['2nd_Invoice_Number'] }}"
+            },
+            {
+              "name": "Email",
+              "value": "={{ $json['Email'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        -208
+      ],
+      "id": "c029280c-76f1-4d44-b693-1c52608e6919",
+      "name": "Start Invoice Checking"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/start-building-phase",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Trello_Card_ID",
+              "value": "={{ $json.Trello_Card_ID }}"
+            },
+            {
+              "name": "Email",
+              "value": "={{ $json.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32,
+        320
+      ],
+      "id": "54a969af-466d-4a55-93aa-c01d976c9c9f",
+      "name": "Start Building Phase"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('Webhook').item.json.query.Email }}",
+            "2nd_Invoice_Number": "={{ $('Create 20% Invoice').item.json.InvoiceNumber }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quote_ID",
+              "displayName": "Quote_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Trello_Card_ID",
+              "displayName": "Trello_Card_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Number",
+              "displayName": "1st_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Paid",
+              "displayName": "1st_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DQ_Form_Submitted",
+              "displayName": "DQ_Form_Submitted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website_Link",
+              "displayName": "Website_Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HP_Design_Approved",
+              "displayName": "HP_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Design_Approved",
+              "displayName": "Final_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Number",
+              "displayName": "2nd_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Paid",
+              "displayName": "2nd_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Website_Approved",
+              "displayName": "Final_Website_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Number",
+              "displayName": "Final_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Paid",
+              "displayName": "Final_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        -304
+      ],
+      "id": "ce2e4b83-5a69-4686-8dde-0e0c5c9c867d",
+      "name": "Add_Invoice_Number"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.xero.com/api.xro/2.0/Invoices/{{ $json.InvoiceNumber }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "xeroOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Xero-tenant-id",
+              "value": "16ef3553-1ccc-4b16-b9cd-8dd77f822653"
+            },
+            {
+              "name": "Accept",
+              "value": "application/pdf"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -160,
+        -304
+      ],
+      "id": "a304aa11-ad7a-48e8-826b-5c02abbe1e0c",
+      "name": "Get Invoice File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Place this Code node between the HTTP Request node and the Email node\n\n// Get the invoice number from JSON or use the file name\nconst invoiceNumber = items[0].json.InvoiceNumber || items[0].binary.data.fileName?.replace('.pdf', '') || 'invoice';\n\n// Return the item with properly formatted binary data\nreturn items.map(item => {\n  return {\n    json: {\n      ...item.json,\n      fileName: `${invoiceNumber}.pdf` // Store filename in JSON for reference\n    },\n    binary: {\n      data: {\n        ...item.binary.data,\n        mimeType: 'application/pdf',\n        fileName: `${invoiceNumber}.pdf`\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -304
+      ],
+      "id": "81b1daf7-6c4d-4ede-9dd0-160d89759c70",
+      "name": "Make Invoice PDF"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.xero.com/api.xro/2.0/Quotes/{{ $json.query.QuoteID}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "xeroOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "value": "=16ef3553-1ccc-4b16-b9cd-8dd77f822653"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -832,
+        -304
+      ],
+      "id": "bfa71aa9-1320-493f-a9e8-0fa859a756c6",
+      "name": "XERO : Get Quote"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Webhook').item.json.query.Email }}",
+        "subject": "Second Invoice",
+        "bodyContent": "Thank you for signing off the design. We’ve attached the next invoice, which is 20% of the total cost. This invoice is due at this stage, so we can move things forward without delay.\n\nThanks again, we’re excited to start bringing your designs to life!",
+        "additionalFields": {
+          "attachments": {
+            "attachments": [
+              {
+                "binaryPropertyName": "data"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -304
+      ],
+      "id": "d965e263-b693-4682-b746-160097ca56a9",
+      "name": "Send Invoice",
+      "webhookId": "aa4bb3f7-b2e5-4a2c-a57f-3672b864d19a"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -176,
+        320
+      ],
+      "id": "923375a9-2e52-4c1e-8176-4e71c90352da",
+      "name": "Get Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.xero.com/api.xro/2.0/Invoices",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "xeroOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "value": "16ef3553-1ccc-4b16-b9cd-8dd77f822653"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"Invoices\": [\n    {\n      \"InvoiceID\": \"{{ $('Create 20% Invoice').item.json.InvoiceID }}\",\n      \"Status\": \"AUTHORISED\",\n      \"DueDate\": \"{{ \n    (() => {\n      const today = new Date(); \n      const due = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);\n      return due.toISOString().split('T')[0];\n    })()\n  }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        512,
+        -304
+      ],
+      "id": "d6170c30-1d85-4b02-94bc-cf4c44e4b21c",
+      "name": "Make Invoice Submitted",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "amount": 3,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -832,
+        32
+      ],
+      "id": "fe4818e7-2b2c-47ab-b674-130ddbe17e0c",
+      "name": "Wait 3 Days",
+      "webhookId": "1308bad5-da64-42e9-b8cb-ba8b6ce77ffd"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a2adf71d6bee98a-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 172.70.243.179",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-mcc62",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "Email": "amjadmunsari@gmail.com",
+            "QuoteID": "f5a1e595-0ba0-4540-bca3-94a42e287bb1"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/second-invoice",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "Email Reminder": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a3c480ba482e862-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 172.70.248.16",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-8929b",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "InvoiceNumber": "INV-40924",
+            "Email": "amjadmunsari@gmail.com"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/second-invoice-reminder",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "Check Invoice Status": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a3c4dc970729745-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 162.158.111.162",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-mcc62",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "InvoiceNumber": "INV-41281",
+            "Email": "amjadmunsari@gmail.com"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/second-invoice-status",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "XERO : Get Quote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate 20% Invoice": {
+      "main": [
+        [
+          {
+            "node": "Create 20% Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create 20% Invoice": {
+      "main": [
+        [
+          {
+            "node": "Get Invoice File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Update Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 15 Min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 15 Min": {
+      "main": [
+        [
+          {
+            "node": "Get invoice.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Data": {
+      "main": [
+        [
+          {
+            "node": "Get Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoice Paid?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminder": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Reminder": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Invoice Status": {
+      "main": [
+        [
+          {
+            "node": "Get invoice.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get invoice": {
+      "main": [
+        [
+          {
+            "node": "Invoice Paid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get invoice.": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add_Invoice_Number": {
+      "main": [
+        [
+          {
+            "node": "Start Reminder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Start Invoice Checking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Invoice File": {
+      "main": [
+        [
+          {
+            "node": "Make Invoice PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make Invoice PDF": {
+      "main": [
+        [
+          {
+            "node": "Send Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XERO : Get Quote": {
+      "main": [
+        [
+          {
+            "node": "Calculate 20% Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Invoice": {
+      "main": [
+        [
+          {
+            "node": "Make Invoice Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Data": {
+      "main": [
+        [
+          {
+            "node": "Start Building Phase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make Invoice Submitted": {
+      "main": [
+        [
+          {
+            "node": "Add_Invoice_Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 Days": {
+      "main": [
+        [
+          {
+            "node": "Get invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9e406242-27ef-4fff-a749-7287198185dc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2e806d8e779904fee169c37d64bf24a4176529c6bae3ae97397462d403b79ca2"
+  },
+  "id": "Um81UgiW2q4l9ny9",
+  "tags": []
+}

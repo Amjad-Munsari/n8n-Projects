@@ -1,0 +1,910 @@
+{
+  "name": "STEP 1 - Check Website Approval",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "final-website",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        32
+      ],
+      "id": "aa7fb20d-428e-4bea-8503-9ab33ac9a865",
+      "name": "Website Approval Webhook",
+      "webhookId": "76091554-6b98-4be9-8735-3d23afe7bbd3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": {
+          "__rl": true,
+          "value": "={{ $('Get Client\\'s Data').item.json.Trello_Card_ID }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "idList": "68c7d830b37a209fa5530059"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -80
+      ],
+      "id": "8a3a4f6e-5715-4b63-b6f9-72608cb19e21",
+      "name": "Move to \"Final Payment\" List"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/final-website-reminder",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Email",
+              "value": "={{ $('Get Client\\'s Email').item.json.Email }}"
+            },
+            {
+              "name": "Name",
+              "value": "={{ $('Get Client\\'s Email').item.json.Name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        128,
+        -288
+      ],
+      "id": "549d2e3d-7d50-4cfe-9a71-b5315c0f8120",
+      "name": "Start Email Reminder"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Name",
+              "lookupValue": "={{ $json.query.Name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -320,
+        -288
+      ],
+      "id": "92a86bf4-4fbc-49ad-a155-f155531b3de4",
+      "name": "Get Client's Email"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "start-final-website",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        -288
+      ],
+      "id": "6132cba9-af1d-400a-b5f7-9550c5c41ee5",
+      "name": "Start Final Website Workflow",
+      "webhookId": "b01fe06c-6893-440d-ad22-274d0befe29a"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.Email }}",
+        "subject": "Final Website Update",
+        "bodyContent": "=<p style=\"margin-bottom:20px;\">Hi {{ $json.Name }},</p>\n\n<p style=\"margin-bottom:20px;\">Great news — we’ve finished building your website, and it’s ready for you to take a look!</p>\n\n<a href=\"{{ $json.Website_Link }}\" target=\"_blank\">\n  View your website\n</a>\n\n<p style=\"margin-bottom:20px;\">This is your chance to explore the site as a whole and let us know how everything feels now that it’s fully built. We recommend clicking through each page, testing links and buttons, and viewing it on both desktop and mobile devices if possible.</p>\n\n<p style=\"margin-bottom:20px;\">As you’re reviewing, a few things you might like to check:</p>\n\n<p style=\"margin-bottom:10px;\">•\tDoes everything look and function as expected?</p>\n<p style=\"margin-bottom:10px;\">•\tIs the content displaying correctly across all pages?</p>\n<p style=\"margin-bottom:10px;\">•\tDo links, buttons, and forms work as they should?</p>\n<p style=\"margin-bottom:20px;\">•\tIs there anything that feels off or could be improved?</p>\n\n<p style=\"margin-bottom:20px;\">Please feel free to share any feedback or changes you’d like — whether it’s something specific or just a general “this doesn’t quite feel right.” All feedback is helpful at this stage.</p>\n\n<p style=\"margin-bottom:20px;\">If you’re happy with everything, we’ll ask you to formally sign off so we can prepare the site for launch.</p>\n\n<p style=\"margin-bottom:20px;\">If you have any questions while reviewing or want help testing anything, just let us know — we’re happy to walk you through it.</p>\n\n<p style=\"margin-bottom:20px;\">Looking forward to hearing your thoughts!</p>\n\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"margin-top: 32px;\">\n  <tr>\n    <td align=\"center\">\n      <a href=\"https://www.internetcreation.net/website-approval/\"\n         target=\"_blank\"\n         style=\"\n           display: inline-block;\n           padding: 16px 40px;\n           font-family: Arial, Helvetica, sans-serif;\n           font-size: 16px;\n           font-weight: 600;\n           color: #ffffff;\n           background-color: #ff7a66;\n           text-decoration: none;\n           border-radius: 8px;\n         \">\n        Sign-Off\n      </a>\n    </td>\n  </tr>\n</table>\n",
+        "additionalFields": {
+          "bodyContentType": "html"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        -288
+      ],
+      "id": "5c04b586-206b-4842-8c8e-2fb18c98520d",
+      "name": "Send Website to Client",
+      "webhookId": "dacaaf04-2cbc-4981-a601-ffd4118b1f7a"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $json.Email }}",
+            "Final_Website_Approved": "={{ $('Website Approval Webhook').item.json.body.radio_1 }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quote_ID",
+              "displayName": "Quote_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trello_Card_ID",
+              "displayName": "Trello_Card_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Number",
+              "displayName": "1st_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Paid",
+              "displayName": "1st_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DQ_Form_Submitted",
+              "displayName": "DQ_Form_Submitted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website_Link",
+              "displayName": "Website_Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HP_Design_Approved",
+              "displayName": "HP_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Design_Approved",
+              "displayName": "Final_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Number",
+              "displayName": "2nd_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Paid",
+              "displayName": "2nd_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Website_Approved",
+              "displayName": "Final_Website_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Number",
+              "displayName": "Final_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Paid",
+              "displayName": "Final_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        32
+      ],
+      "id": "e42e91f1-3ffa-4c87-b8c5-91aca51197c4",
+      "name": "Update Final Website Status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f9e6bbe0-7ee1-4fb5-9de2-4cced65fed81",
+              "leftValue": "={{ $json.Final_Website_Approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        368
+      ],
+      "id": "0a9ea005-8d5b-4d9a-b546-f52f765710ce",
+      "name": "Client Responded?"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.Email }}",
+        "subject": "Website Approval Reminder",
+        "bodyContent": "Dear Client,\n\nThe final website has been emailed to you. Please check it out and fill out the website approval form.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        352,
+        432
+      ],
+      "id": "10226232-27aa-4cbf-bc14-b7415d680f98",
+      "name": "Send Reminder",
+      "webhookId": "66341cfd-ee10-42c6-a295-5d6d6ac09d97"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "final-website-reminder",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        432
+      ],
+      "id": "72c17a4d-66c1-487b-869e-a9a3aa852065",
+      "name": "Email Reminder Webhook",
+      "webhookId": "40800a92-4c38-4ffd-a846-c85425c427c9"
+    },
+    {
+      "parameters": {
+        "amount": 3,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        432
+      ],
+      "id": "a654457f-968d-40ce-b940-b1506699215f",
+      "name": "Wait 3 Days",
+      "webhookId": "f67bccdd-485b-40e2-bbc4-7c8e51568ff3"
+    },
+    {
+      "parameters": {
+        "toRecipients": "ian@internetcreation.net,mike@internetcreation.net",
+        "subject": "Final Website Update",
+        "bodyContent": "=Your Client {{ $json.Email }} didn't approve the final website.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        560,
+        144
+      ],
+      "id": "97e0f4a7-e233-4ded-82df-9acbf88de178",
+      "name": "Notify Team.",
+      "webhookId": "db082acb-de3f-4f9e-ac11-74c2c08e931f"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $('Email Reminder Webhook').item.json.query.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -96,
+        368
+      ],
+      "id": "cdf6a411-958e-46b1-8ef1-ace465e40073",
+      "name": "Check Final Website Approval"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "af42b91f-54e7-4d98-b9bf-03fce89b8288",
+              "leftValue": "={{ $json.Final_Website_Approved }}",
+              "rightValue": "YES approved",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        112,
+        32
+      ],
+      "id": "c8f2cba9-e90d-4971-a780-99eb57694570",
+      "name": "Approved?"
+    },
+    {
+      "parameters": {
+        "toRecipients": "ian@internetcreation.net,mike@internetcreation.net",
+        "subject": "Final Website Update",
+        "bodyContent": "=Your Client {{ $('Get Client\\'s Data').item.json.Email }} approved the final website.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        560,
+        -80
+      ],
+      "id": "26bbec18-c01c-4f78-a2cb-57e475501bb2",
+      "name": "Notify Team",
+      "webhookId": "db082acb-de3f-4f9e-ac11-74c2c08e931f"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/final-payment",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Email",
+              "value": "={{ $('Get Client\\'s Data').item.json.Email }}"
+            },
+            {
+              "name": "QuoteID",
+              "value": "={{ $('Get Client\\'s Data').item.json.Quote_ID }}"
+            },
+            {
+              "name": "Name",
+              "value": "={{ $('Get Client\\'s Data').item.json.Name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        784,
+        -80
+      ],
+      "id": "18108180-e575-4881-92d0-d7197eff0e86",
+      "name": "Start Final Payment"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.body.email_1 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -336,
+        32
+      ],
+      "id": "0faa8533-9bf3-4f32-9c8c-8c2b1d935de3",
+      "name": "Get Client's Data"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": {
+          "__rl": true,
+          "value": "={{ $('Get Client\\'s Data').item.json.Trello_Card_ID }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "idList": "68c7d80ffbdaa79c77450c8b"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        336,
+        144
+      ],
+      "id": "aed3bc2b-a939-4ed6-9f43-72de5b582bf9",
+      "name": "Move to \"Building\" List."
+    }
+  ],
+  "pinData": {
+    "Website Approval Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "WordPress/6.8.3; https://www.internetcreation.net ForminatorWebhook/1.0",
+            "content-length": "457",
+            "accept": "application/json",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "62.182.18.59",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "GB",
+            "cf-ray": "98f74d2887024599-LHR",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "62.182.18.59, 172.70.91.220",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-8929b",
+            "x-is-trusted": "yes",
+            "x-real-ip": "62.182.18.59"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "text_9": "Amjad Test",
+            "name_1": "Amjad Test",
+            "text_1": "Amjad Test",
+            "text_4": "Amjad Test",
+            "email_1": "amjadmunsari@gmail.com",
+            "radio_1": "YES approved",
+            "referer_url": "",
+            "_wp_http_referer": "/website-approval/",
+            "page_id": "58827",
+            "form_type": "default",
+            "current_url": "https://www.internetcreation.net/website-approval/",
+            "render_id": "0",
+            "input_7": "",
+            "form_uid": "68ec938463479",
+            "_forminator_user_ip": null,
+            "form_title": "Website Approval",
+            "entry_time": "2025-10-16 12:43:56"
+          },
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/76091554-6b98-4be9-8735-3d23afe7bbd3",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "Start Final Website Workflow": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a3ff880719268f8-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 162.158.87.103",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-mcc62",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "Name": "Test"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/final-website",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "Email Reminder Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a400a1c07924d32-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 172.69.151.22",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-mcc62",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "Email": "amjadmunsari@gmail.com",
+            "Name": "Test"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/final-website-reminder",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Website Approval Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Client's Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move to \"Final Payment\" List": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Client's Email": {
+      "main": [
+        [
+          {
+            "node": "Send Website to Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Final Website Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Client's Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Website to Client": {
+      "main": [
+        [
+          {
+            "node": "Start Email Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Final Website Status": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Responded?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminder": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Reminder Webhook": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 Days": {
+      "main": [
+        [
+          {
+            "node": "Check Final Website Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Final Website Approval": {
+      "main": [
+        [
+          {
+            "node": "Client Responded?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Move to \"Final Payment\" List",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Move to \"Building\" List.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team": {
+      "main": [
+        [
+          {
+            "node": "Start Final Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Client's Data": {
+      "main": [
+        [
+          {
+            "node": "Update Final Website Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move to \"Building\" List.": {
+      "main": [
+        [
+          {
+            "node": "Notify Team.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e855118b-a509-4a53-ac6e-609ef946218b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2e806d8e779904fee169c37d64bf24a4176529c6bae3ae97397462d403b79ca2"
+  },
+  "id": "mQs6nd32sWj0jC7w",
+  "tags": []
+}

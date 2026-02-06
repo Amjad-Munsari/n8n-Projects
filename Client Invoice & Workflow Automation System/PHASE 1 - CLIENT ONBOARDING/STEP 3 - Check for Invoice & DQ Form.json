@@ -1,0 +1,213 @@
+{
+  "name": "STEP 3 - Check for Invoice & DQ Form",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "check-both",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -624,
+        96
+      ],
+      "id": "040175a6-7afd-4402-8fc0-cb874a342e03",
+      "name": "Check Invoice + DQ",
+      "webhookId": "1baede2f-91e9-4bde-975b-bbb53a24cbbc"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.query.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -416,
+        96
+      ],
+      "id": "725a1b78-5555-49ce-b059-7e05dd8afb29",
+      "name": "Get Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b39d7680-5ed9-4bbd-9caf-5f495b151d28",
+              "leftValue": "={{ $json['1st_Invoice_Paid'] }}",
+              "rightValue": "YES",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "f10fa5bc-8bb3-4e0c-8a52-1c771f92917a",
+              "leftValue": "={{ $json.DQ_Form_Submitted }}",
+              "rightValue": "YES",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        96
+      ],
+      "id": "4fd09c23-7cd6-402d-a75a-eb31be143b96",
+      "name": "Invoice + DQ Done?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/design-phase",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Trello Card ID",
+              "value": "={{ $json.Trello_Card_ID }}"
+            },
+            {
+              "name": "Name",
+              "value": "={{ $json.Name }}"
+            },
+            {
+              "name": "Email",
+              "value": "={{ $json.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7f800f60-c3d7-43ef-b285-3247390aaf6f",
+      "name": "Start Design Phase"
+    }
+  ],
+  "pinData": {
+    "Check Invoice + DQ": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a269e1f60939136-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 172.70.251.108",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-mcc62",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "Email": "amjadmunsari@gmail.com"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/check-both",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Check Invoice + DQ": {
+      "main": [
+        [
+          {
+            "node": "Get Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Data": {
+      "main": [
+        [
+          {
+            "node": "Invoice + DQ Done?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoice + DQ Done?": {
+      "main": [
+        [
+          {
+            "node": "Start Design Phase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c9d3628a-bc06-4dcb-9611-9d3e7ed47755",
+  "meta": {
+    "instanceId": "2e806d8e779904fee169c37d64bf24a4176529c6bae3ae97397462d403b79ca2"
+  },
+  "id": "0C3u2xFNjPgAqzKr",
+  "tags": []
+}

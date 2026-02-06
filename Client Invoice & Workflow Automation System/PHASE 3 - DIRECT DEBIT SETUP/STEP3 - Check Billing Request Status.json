@@ -1,0 +1,664 @@
+{
+  "name": "STEP3 - Check Billing Request Status",
+  "nodes": [
+    {
+      "parameters": {
+        "toRecipients": "ian@internetcreation.net,mike@internetcreation.net",
+        "subject": "Let's Launch a Website!",
+        "bodyContent": "=Your client with the email {{ $('Get Client Data').item.json.Email }} has set up the D/D and is ready to get his website launched!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        0
+      ],
+      "id": "52c36f8f-35ad-4a41-818c-0453aad8a86f",
+      "name": "Notify Team",
+      "webhookId": "2995f79a-b9c9-4968-a00e-549b6696073f"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f79d3768-98c2-4473-8978-c5b5dbd032b5",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8339efd4-f11b-4c69-b72e-d77735226068",
+      "name": "MAIN",
+      "webhookId": "f79d3768-98c2-4473-8978-c5b5dbd032b5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/9967a49c-52c1-4a57-a6c4-d2ea88169d3a",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Card ID",
+              "value": "={{ $('Get Client Data').item.json.Trello_Card_ID }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2016,
+        0
+      ],
+      "id": "7aa1cc1a-ca94-458e-b026-dca495c2caf4",
+      "name": "Delete Client Data"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.customers.email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "93b664ce-4fa2-4c24-b827-9b017d5eea81",
+      "name": "Get Client Data"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": {
+          "__rl": true,
+          "value": "={{ $('Get Client Data').item.json.Trello_Card_ID }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "idList": "68c7d82a1292239bbafbc74a"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        0
+      ],
+      "id": "dc9d8094-5ce7-408b-8ccf-1b4e5981aa2d",
+      "name": "Move Card to \"Launch\" list"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract events from GoCardless webhook - n8n Code Node\n\nconst results = [];\n\nfor (const item of $input.all()) {\n  const inputData = item.json;\n  \n  // Get the events array from webhook body\n  const events = $input.first().json.body.events;\n  \n  // Create a separate output item for each event\n  for (const event of events) {\n    results.push({\n      json: event\n    });\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b0be42a2-ccff-42ce-93fb-53541235b046",
+      "name": "Extract Events"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ca77fb68-1bdd-40b7-8ac7-981a14bc9483",
+              "leftValue": "={{ $('Extract Events').item.json.resource_type }}",
+              "rightValue": "billing_requests",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "eacfe81f-ccb3-412f-a3de-497039ff0dbf",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "fulfilled",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "b1f52922-1fef-463c-98b3-c74e9e4bb2fc",
+      "name": "billing request fulfilled?"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.gocardless.com/customers/{{ $json.links.customer }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "GoCardless-Version",
+              "value": "2015-07-06"
+            },
+            {
+              "name": "Authorization"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        896,
+        0
+      ],
+      "id": "27767c8f-22d8-43ea-9ea3-bb4988846e11",
+      "name": "Get Customer Details"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "51f4a8b9-1105-4b07-a2e0-62d873f70fc4",
+      "name": "Loop Over Events"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $json.Email }}",
+            "Mandate_ID": "={{ $('billing request fulfilled?').item.json.links.mandate_request_mandate }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quote_ID",
+              "displayName": "Quote_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trello_Card_ID",
+              "displayName": "Trello_Card_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Number",
+              "displayName": "1st_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Paid",
+              "displayName": "1st_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DQ_Form_Submitted",
+              "displayName": "DQ_Form_Submitted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website_Link",
+              "displayName": "Website_Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HP_Design_Approved",
+              "displayName": "HP_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Design_Approved",
+              "displayName": "Final_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Number",
+              "displayName": "2nd_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Paid",
+              "displayName": "2nd_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Website_Approved",
+              "displayName": "Final_Website_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Number",
+              "displayName": "Final_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Paid",
+              "displayName": "Final_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Billing_Request_ID",
+              "displayName": "Billing_Request_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mandate_ID",
+              "displayName": "Mandate_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        0
+      ],
+      "id": "8509ccfa-3652-44b7-8d0e-0c1ecea39beb",
+      "name": "Add Mandate ID"
+    }
+  ],
+  "pinData": {
+    "MAIN": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "gocardless-webhook-service/1.2",
+            "content-length": "1582",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "35.204.214.181",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "NL",
+            "cf-ray": "9ab40e4347f48ea8-AMS",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "origin": "https://api.gocardless.com",
+            "webhook-signature": "d298eb47fef4dc07db467241feac6e680e50cc74dfd1d98a6cbb4a3737aad987",
+            "x-forwarded-for": "35.204.214.181, 104.23.166.105",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-92q9v",
+            "x-is-trusted": "yes",
+            "x-real-ip": "35.204.214.181"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "events": [
+              {
+                "id": "EV0841KN6ZATW3",
+                "created_at": "2025-12-09T11:10:18.143Z",
+                "resource_type": "billing_requests",
+                "action": "payer_details_confirmed",
+                "metadata": {},
+                "details": {
+                  "origin": "api",
+                  "cause": "billing_request_payer_details_confirmed",
+                  "description": "Payer has confirmed all their details for this billing request."
+                },
+                "links": {
+                  "customer": "CU01KGBRVZ4C78",
+                  "customer_bank_account": "BA01KB9T7J0YSC",
+                  "billing_request_flow": "BRF01KBZRX0K2YXAXPD8741V5ZG2GAGJ",
+                  "billing_request": "BRQ002N79Z1K57D"
+                },
+                "resource_metadata": {
+                  "internal_id": "",
+                  "customer_reference": ""
+                },
+                "organisation_id": "OR000027004XS6"
+              },
+              {
+                "id": "EV0841KN7BRE2K",
+                "created_at": "2025-12-09T11:10:18.553Z",
+                "resource_type": "billing_requests",
+                "action": "fulfilled",
+                "metadata": {},
+                "details": {
+                  "origin": "api",
+                  "cause": "billing_request_fulfilled",
+                  "description": "This billing request has been fulfilled, and the resources have been created."
+                },
+                "links": {
+                  "customer": "CU01KGBRVZ4C78",
+                  "customer_bank_account": "BA01KB9T7J0YSC",
+                  "mandate_request_mandate": "MD01KBSRXTE9HY",
+                  "billing_request": "BRQ002N79Z1K57D"
+                },
+                "resource_metadata": {
+                  "internal_id": "",
+                  "customer_reference": ""
+                },
+                "organisation_id": "OR000027004XS6"
+              },
+              {
+                "id": "EV0841KN7A9A63",
+                "created_at": "2025-12-09T11:10:18.512Z",
+                "resource_type": "mandates",
+                "action": "created",
+                "metadata": {},
+                "details": {
+                  "origin": "api",
+                  "cause": "mandate_created",
+                  "description": "Mandate created via the API.",
+                  "scheme": "bacs"
+                },
+                "links": {
+                  "billing_request": "BRQ002N79Z1K57D",
+                  "mandate_request": "MRQ01KBZRX0EGNW095",
+                  "mandate": "MD01KBSRXTE9HY"
+                },
+                "resource_metadata": {},
+                "organisation_id": "OR000027004XS6"
+              }
+            ],
+            "meta": {
+              "webhook_id": "WB01KC1CW9EJ9N"
+            }
+          },
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/f79d3768-98c2-4473-8978-c5b5dbd032b5",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "Get Customer Details": [
+      {
+        "json": {
+          "customers": {
+            "id": "CU01KGBRVZ4C78",
+            "created_at": "2025-12-08T20:02:00.771Z",
+            "email": "ian141270@googlemail.com",
+            "given_name": "Ian",
+            "family_name": "Paltiel",
+            "company_name": null,
+            "address_line1": "2 McGregor Court, Crossgates",
+            "address_line2": null,
+            "address_line3": null,
+            "city": "Cowdenbeath",
+            "region": null,
+            "postal_code": "KY4 8ER",
+            "country_code": "GB",
+            "language": "en",
+            "swedish_identity_number": null,
+            "danish_identity_number": null,
+            "phone_number": null,
+            "metadata": {}
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Notify Team": {
+      "main": [
+        [
+          {
+            "node": "Delete Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MAIN": {
+      "main": [
+        [
+          {
+            "node": "Extract Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Client Data": {
+      "main": [
+        [
+          {
+            "node": "Add Mandate ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Card to \"Launch\" list": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Events": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "billing request fulfilled?": {
+      "main": [
+        [
+          {
+            "node": "Get Customer Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer Details": {
+      "main": [
+        [
+          {
+            "node": "Get Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Events": {
+      "main": [
+        [],
+        [
+          {
+            "node": "billing request fulfilled?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Mandate ID": {
+      "main": [
+        [
+          {
+            "node": "Move Card to \"Launch\" list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "beb6b927-793c-47c7-8ebe-dbd6b23c037e",
+  "meta": {
+    "instanceId": "2e806d8e779904fee169c37d64bf24a4176529c6bae3ae97397462d403b79ca2"
+  },
+  "id": "1h6Fvj0MXavi8xv5nvXqn",
+  "tags": []
+}

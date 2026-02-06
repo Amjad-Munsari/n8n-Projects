@@ -1,0 +1,593 @@
+{
+  "name": "STEP 2.1 - Invoice Reminder Loop",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "invoice-reminder",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        -1504
+      ],
+      "id": "cd45ca7a-2e0c-4b14-b5c7-59974c569320",
+      "name": "Webhook",
+      "webhookId": "4c7748b1-12d9-4f7b-b58f-e6ea321e4665"
+    },
+    {
+      "parameters": {
+        "amount": 3,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -208,
+        -1504
+      ],
+      "id": "09b0c9a1-aff4-426e-8e32-ae4bfbfe5ea6",
+      "name": "Wait 3 Days",
+      "webhookId": "1308bad5-da64-42e9-b8cb-ba8b6ce77ffd"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "organizationId": "16ef3553-1ccc-4b16-b9cd-8dd77f822653",
+        "invoiceId": "={{ $('Webhook').item.json.query['Invoice Number'] }}"
+      },
+      "type": "n8n-nodes-base.xero",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -1568
+      ],
+      "id": "70a7f640-4fdb-4acc-a8cb-39c302c2b43c",
+      "name": "Get an invoice"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bfced571-2306-42c2-bb17-228dcac5b324",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "PAID",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        -1568
+      ],
+      "id": "d77a8e6d-9025-4a45-a918-35207066958f",
+      "name": "Invoice Paid?"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "check-invoice",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        -1152
+      ],
+      "id": "a46407f1-0365-4ff5-abdf-ec9166ad7308",
+      "name": "Webhook1",
+      "webhookId": "3b94ecbb-8fb0-4dcb-9a1c-eb00db31ab66"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "916cc07e-6976-43da-b27d-d0e432c97552",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "PAID",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        -1232
+      ],
+      "id": "99d25df9-1ebd-412c-a26e-f6af8c8a639c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 15,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        -1056
+      ],
+      "id": "b69c2588-6550-44e5-9bca-a69f0c08d9a7",
+      "name": "Wait 15 Min",
+      "webhookId": "6d4e2795-eb0b-475b-8f09-2817f75a16c0"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/check-both",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Email",
+              "value": "={{ $('Webhook1').item.json.query['Email'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        -1280
+      ],
+      "id": "1e560ccb-ac1e-4cad-b97d-0e7e63d70471",
+      "name": "Check Invoice + DQ"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Webhook').item.json.query.Email }}",
+        "subject": "Invoice Reminder",
+        "bodyContent": "I hope you’re doing well.\n\nI just wanted to send a quick, friendly reminder regarding the invoice for the website project. Once payment is received, we’ll be able to officially kick things off and get started right away.\n\nIf you’ve already taken care of this, thank you so much — please feel free to ignore this note. And if you have any questions or need anything from us to move things along, I’m happy to help.\n\nLooking forward to getting started!\n\nBest regards,\nInternet Creation",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        464,
+        -1504
+      ],
+      "id": "712ddb0d-1365-4c5a-a1fc-008459130192",
+      "name": "Send Reminder",
+      "webhookId": "18613164-9d35-4e0e-89db-2cef53f5f32d"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "organizationId": "16ef3553-1ccc-4b16-b9cd-8dd77f822653",
+        "invoiceId": "={{ $('Webhook1').item.json.query['Invoice Number'] }}"
+      },
+      "type": "n8n-nodes-base.xero",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -1152
+      ],
+      "id": "4657718c-238b-4973-8a43-7a5ce6025f4b",
+      "name": "Get an invoice."
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "1st_Invoice_Paid": "YES",
+            "1st_Invoice_Number": "={{ $('Webhook1').item.json.query['Invoice Number'] }}"
+          },
+          "matchingColumns": [
+            "1st_Invoice_Number"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quote_ID",
+              "displayName": "Quote_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Trello_Card_ID",
+              "displayName": "Trello_Card_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Number",
+              "displayName": "1st_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "1st_Invoice_Paid",
+              "displayName": "1st_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DQ_Form_Submitted",
+              "displayName": "DQ_Form_Submitted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website_Link",
+              "displayName": "Website_Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HP_Design_Approved",
+              "displayName": "HP_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Design_Approved",
+              "displayName": "Final_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Number",
+              "displayName": "2nd_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "2nd_Invoice_Paid",
+              "displayName": "2nd_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Website_Approved",
+              "displayName": "Final_Website_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Number",
+              "displayName": "Final_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Final_Invoice_Paid",
+              "displayName": "Final_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        -1280
+      ],
+      "id": "7248bf15-0903-466f-82ba-80b151c825c0",
+      "name": "Update Data",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a7dfa0c74149279-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 172.70.243.179",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-4pbk8",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "Name": "ian paltiel (gmail)",
+            "Invoice Number": "INV-41013",
+            "Email": "ian141270@googlemail.com"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/invoice-reminder",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "Webhook1": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a7dfa2ac60a3819-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 162.158.94.150",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-mcc62",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "Invoice Number": "INV-41013",
+            "Email": "ian141270@googlemail.com"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/check-invoice",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 Days": {
+      "main": [
+        [
+          {
+            "node": "Get an invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an invoice": {
+      "main": [
+        [
+          {
+            "node": "Invoice Paid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoice Paid?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Get an invoice.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Update Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 15 Min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 15 Min": {
+      "main": [
+        [
+          {
+            "node": "Get an invoice.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminder": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an invoice.": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Data": {
+      "main": [
+        [
+          {
+            "node": "Check Invoice + DQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b053d4d4-8450-42e9-816e-bf2ac083fd78",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2e806d8e779904fee169c37d64bf24a4176529c6bae3ae97397462d403b79ca2"
+  },
+  "id": "pHcFqqJ8w3SHAv9C",
+  "tags": []
+}

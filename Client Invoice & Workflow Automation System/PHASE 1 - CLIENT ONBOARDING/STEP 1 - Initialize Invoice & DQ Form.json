@@ -1,0 +1,1258 @@
+{
+  "name": "STEP 1 - Initialize Invoice & DQ Form",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/check-invoice",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Invoice Number",
+              "value": "={{ $('Create 30% Invoice').item.json.InvoiceNumber }}"
+            },
+            {
+              "name": "Email",
+              "value": "={{ $('Get Contact').item.json.EmailAddress }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1488,
+        240
+      ],
+      "id": "0d275441-5a48-44e6-a1b4-a2912dceb257",
+      "name": "Check Invoice"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/invoice-reminder",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Name",
+              "value": "={{ $('Create 30% Invoice').item.json.Contact.Name }}"
+            },
+            {
+              "name": "Invoice Number",
+              "value": "={{ $('Create 30% Invoice').item.json.InvoiceNumber }}"
+            },
+            {
+              "name": "Email",
+              "value": "={{ $json.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1488,
+        -144
+      ],
+      "id": "1573da92-cb00-462f-9a59-23a598dcf3e0",
+      "name": "Start Invoice Reminder"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/dq-reminder",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Name",
+              "value": "={{ $('Create 30% Invoice').item.json.Contact.Name }}"
+            },
+            {
+              "name": "Invoice Number",
+              "value": "={{ $('Create 30% Invoice').item.json.InvoiceNumber }}"
+            },
+            {
+              "name": "Email",
+              "value": "={{ $json.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1488,
+        48
+      ],
+      "id": "f4565127-8598-49e1-aaea-495c71e29f38",
+      "name": "Start DQ Reminder"
+    },
+    {
+      "parameters": {
+        "listId": "68c7d7e6b4c701804bb5dcf2",
+        "name": "={{ $('Get Contact').item.json.Name }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        48
+      ],
+      "id": "6572be35-e200-4c5f-951a-c2cd55ed2d35",
+      "name": "Create a card"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "custom": "from/emailAddress/address ne 'info@internetcreation.net'"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2448,
+        160
+      ],
+      "id": "484d3883-0a24-43d0-821e-9d648b99c135",
+      "name": "Microsoft Outlook Trigger",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "url": "https://api.xero.com/connections",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "xeroOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -672,
+        304
+      ],
+      "id": "40d7ff36-f781-4f17-9899-4c88c27c288d",
+      "name": "XERO : Get Tenant ID"
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "getAll",
+        "organizationId": "16ef3553-1ccc-4b16-b9cd-8dd77f822653",
+        "limit": 3,
+        "options": {
+          "where": "=EmailAddress==\"{{ $('Microsoft Outlook Trigger').item.json.from }}\" "
+        }
+      },
+      "type": "n8n-nodes-base.xero",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        48
+      ],
+      "id": "613e7ff6-d9ea-47bc-8d5a-9c285c41d151",
+      "name": "Get Contact"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.xero.com/api.xro/2.0/Quotes?ContactID={{ $json.ContactID }}&status=SENT",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "xeroOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "value": "=16ef3553-1ccc-4b16-b9cd-8dd77f822653"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -672,
+        48
+      ],
+      "id": "07b75703-c54e-4d99-972d-83f7cf31c782",
+      "name": "XERO : Get Quote"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input number from the previous node\nconst inputNumber = $('XERO : Get Quote').first().json.Quotes[0].Total;\n\n// Calculate 30% and round to nearest decimal\nconst result = Math.round(inputNumber * 0.3 * 10) / 10;\n\n// Return the result\nreturn {\n  json: {\n    original: inputNumber,\n    thirtyPercent: result\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        48
+      ],
+      "id": "22c7afad-e60f-480c-b892-01adf8f321e0",
+      "name": "Calculate 30% Invoice"
+    },
+    {
+      "parameters": {
+        "organizationId": "16ef3553-1ccc-4b16-b9cd-8dd77f822653",
+        "type": "ACCREC",
+        "contactId": "={{ $('Get Contact').item.json.ContactID }}",
+        "lineItemsUi": {
+          "lineItemsValues": [
+            {
+              "description": "Description",
+              "unitAmount": "={{ $json.thirtyPercent }}",
+              "itemCode": "=",
+              "accountCode": "101",
+              "taxType": "=OUTPUT2"
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.xero",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        48
+      ],
+      "id": "626fae7e-5c6a-4ad4-8954-9489a3e85f4a",
+      "name": "Create 30% Invoice"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Get Contact').item.json.EmailAddress }}",
+        "subject": "First Invoice",
+        "bodyContent": "Thanks so much for accepting the quote — we’re really looking forward to working with you on this project!\n\nTo get everything moving, there are just two quick things we’ll need from you before we start:\n\n- First, the initial invoice\nYou’ll find your first invoice attached below, which represents 30% of the total project cost. Once this is paid, we can schedule your project and get underway. \n\n- Next, the design questionnaire\nWe’ve also included a link to our design questionnaire, which helps our designers understand your brand, goals, and overall vision for the website.\n\nhttps://www.internetcreation.net/design-questionnaire/\n\nWhen filling this out, the more detail you can share, the better. It really helps our design team create a homepage that feels right for your business from the very start.\n\nAs soon as the invoice is paid and the questionnaire is completed, we’ll be able to proceed.\n\nIf you have any questions along the way, reply to this email — we’re always happy to help.\n\nAll the best\nInternet Creation",
+        "additionalFields": {
+          "attachments": {
+            "attachments": [
+              {
+                "binaryPropertyName": "data"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        624,
+        48
+      ],
+      "id": "d949ecb8-2beb-4ee4-bb42-4b25d8703b28",
+      "name": "Send Invoice",
+      "webhookId": "aa4bb3f7-b2e5-4a2c-a57f-3672b864d19a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI Agent in an n8n workflow tasked with classifying client responses to quotes.\n\nYOUR TASK:\nAnalyze the client's message and determine if it's a response to a quote we sent them. Then classify their response.\n\nOUTPUT OPTIONS (output ONLY one of these words, nothing else):\n- \"ACCEPTED\" - if the client accepted/approved the quote\n- \"REJECTED\" - if the client declined/rejected the quote  \n- \"UNKNOWN\" - if it's a quote response but the intent is unclear\n- \"IRRELEVANT\" - if the message is NOT related to accepting/rejecting a quote\n\nCONTEXT:\nOur workflow sends quotes to clients via email. Clients reply to accept or reject the quote. Your job is to classify their reply.\n\nCLASSIFICATION GUIDELINES:\n1. ACCEPTED - Look for phrases like:\n   - \"I accept\", \"approved\", \"yes\", \"let's proceed\", \"go ahead\"\n   - \"looks good\", \"confirmed\", \"agree to the terms\"\n   - Notifications that a client has accepted (e.g., \"Your client... has accepted\")\n\n2. REJECTED - Look for phrases like:\n   - \"I decline\", \"no thanks\", \"too expensive\", \"not interested\"\n   - \"we'll pass\", \"cannot proceed\", \"rejected\"\n\n3. IRRELEVANT - Any message that is:\n   - NOT about a quote response\n   - General inquiries, support requests, or unrelated topics\n   - EXCEPTION: System notifications about quote acceptance/rejection ARE relevant\n\nCLIENT MESSAGE DETAILS:\n- From: {{ $json.from }}\n- Subject: {{ $json.subject }}\n- Body Preview: {{ $json.bodyPreview }}\n\nCRITICAL: Output ONLY one word: ACCEPTED, REJECTED, UNKNOWN, or IRRELEVANT",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2176,
+        160
+      ],
+      "id": "0803edbf-2b38-43b5-9082-1a83220e7a33",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "1VUxDhdYYC4JVvJt"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -2096,
+        384
+      ],
+      "id": "4c56cb63-67ee-47dc-8926-750929c5a7b7",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "ACCEPTED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "88f3caf4-bfdc-4d99-a872-a73306c35cdd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Accepted"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0be1c1d7-b2c6-4ebc-b844-a59d3edabbba",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "REJECTED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Rejected"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ff4bb90f-6c7a-4fce-a7bc-e97c709646b8",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "IRRELEVANT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Irrelevant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1760,
+        128
+      ],
+      "id": "f813db58-ebf6-4629-b887-4f1b88c73ae0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "toRecipients": "ian@internetcreation.net,mike@internetcreation.net",
+        "subject": "Quote Rejected",
+        "bodyContent": "=Your client with the following email address has rejected the quote:\n{{ $('Microsoft Outlook Trigger').item.json.from }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        240
+      ],
+      "id": "b348dc1b-b38e-422e-b9fb-246c1ba25aeb",
+      "name": "Notify Team.",
+      "webhookId": "1825d0d5-a0c0-419a-8613-c22b09b49a1b"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $('Microsoft Outlook Trigger').item.json.from }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1536,
+        48
+      ],
+      "id": "6d1e5dc3-d142-44e0-adbb-8de0238d40d2",
+      "name": "Check Client's Email",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "toRecipients": "ian@internetcreation.net,mike@internetcreation.net",
+        "subject": "Quote Accepted",
+        "bodyContent": "=Your client with the following email address has accepted the quote:\n{{ $('Microsoft Outlook Trigger').item.json.from }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        48
+      ],
+      "id": "af917a69-d652-4253-bb5d-8ef402ca3894",
+      "name": "Notify Team",
+      "webhookId": "1825d0d5-a0c0-419a-8613-c22b09b49a1b"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5df9f16c-9204-42b9-891b-2a3ce5aa5e41",
+              "leftValue": "={{ $json.Email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1312,
+        48
+      ],
+      "id": "800538b5-2c63-4b2d-854a-5c06d4bfa909",
+      "name": "Email Found?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5df9f16c-9204-42b9-891b-2a3ce5aa5e41",
+              "leftValue": "={{ $json.Email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1312,
+        240
+      ],
+      "id": "4c7f23f5-6fb3-4c1b-b3fe-8edcf3c77cba",
+      "name": "Email Found?."
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to access previous messages to get context on the input email.",
+        "operation": "getAll",
+        "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Limit', ``, 'number') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTool",
+      "typeVersion": 2,
+      "position": [
+        -1968,
+        384
+      ],
+      "id": "76c88496-7a25-4a4a-965f-c7bad4bb0279",
+      "name": "Get messages ",
+      "webhookId": "6be66534-44b4-4490-8611-13dd5ff9d802"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $('Microsoft Outlook Trigger').item.json.from }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1536,
+        240
+      ],
+      "id": "c1171f0a-6478-4550-a28b-bbc6b5b47bb2",
+      "name": "Check Client's Email.",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU",
+          "mode": "list",
+          "cachedResultName": "n8n moderator",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 925791970,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AjhiGshTh5I0wXJK2t2ZOGt1_aNBKnxEHLcBTYVF9pU/edit#gid=925791970"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "1st_Invoice_Paid": "NO",
+            "DQ_Form_Submitted": "NO",
+            "Trello_Card_ID": "={{ $json.id }}",
+            "1st_Invoice_Number": "={{ $('Create 30% Invoice').item.json.InvoiceNumber }}",
+            "Name": "={{ $('Get Contact').item.json.Name }}",
+            "Email": "={{ $('Get Contact').item.json.EmailAddress }}",
+            "Quote_ID": "={{ $('XERO : Get Quote').item.json.Quotes[0].QuoteID }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quote_ID",
+              "displayName": "Quote_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Trello_Card_ID",
+              "displayName": "Trello_Card_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Number",
+              "displayName": "1st_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st_Invoice_Paid",
+              "displayName": "1st_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DQ_Form_Submitted",
+              "displayName": "DQ_Form_Submitted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website_Link",
+              "displayName": "Website_Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HP_Design_Approved",
+              "displayName": "HP_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Design_Approved",
+              "displayName": "Final_Design_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2nd_Invoice_Number",
+              "displayName": "2nd_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "2nd_Invoice_Paid",
+              "displayName": "2nd_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Website_Approved",
+              "displayName": "Final_Website_Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final_Invoice_Number",
+              "displayName": "Final_Invoice_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Final_Invoice_Paid",
+              "displayName": "Final_Invoice_Paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Billing_Request_ID",
+              "displayName": "Billing_Request_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mandate_ID",
+              "displayName": "Mandate_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        48
+      ],
+      "id": "154a3f46-8943-4898-8888-028ef09c9d7f",
+      "name": "Append Data",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "=https://api.xero.com/api.xro/2.0/Invoices/{{ $json.InvoiceNumber }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "xeroOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Xero-tenant-id",
+              "value": "16ef3553-1ccc-4b16-b9cd-8dd77f822653"
+            },
+            {
+              "name": "Accept",
+              "value": "application/pdf"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        192,
+        48
+      ],
+      "id": "ba192014-e1e5-4d6f-9998-d824bfcb882d",
+      "name": "Get Invoice File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Place this Code node between the HTTP Request node and the Email node\n\n// Get the invoice number from JSON or use the file name\nconst invoiceNumber = items[0].json.InvoiceNumber || items[0].binary.data.fileName?.replace('.pdf', '') || 'invoice';\n\n// Return the item with properly formatted binary data\nreturn items.map(item => {\n  return {\n    json: {\n      ...item.json,\n      fileName: `${invoiceNumber}.pdf` // Store filename in JSON for reference\n    },\n    binary: {\n      data: {\n        ...item.binary.data,\n        mimeType: 'application/pdf',\n        fileName: `${invoiceNumber}.pdf`\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        48
+      ],
+      "id": "93e3291a-23f9-4c95-a642-4a608bb10126",
+      "name": "Make Invoice PDF"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.xero.com/api.xro/2.0/Quotes",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "xeroOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "value": "16ef3553-1ccc-4b16-b9cd-8dd77f822653"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"QuoteID\": \"{{ $json.Quotes[0].QuoteID }}\",\n\"Contact\": {\n  \"ContactID\": \"{{ $json.Quotes[0].Contact.ContactID }}\"\n},\n\"Date\": \"{{ $json.Quotes[0].DateString.split('T')[0] }}\",\n\"Status\": \"ACCEPTED\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -464,
+        48
+      ],
+      "id": "e914d100-f0c6-4fd2-aaa0-920a69dc122e",
+      "name": "Make Quote Accepted",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.xero.com/api.xro/2.0/Invoices",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "xeroOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "value": "16ef3553-1ccc-4b16-b9cd-8dd77f822653"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"Invoices\": [\n    {\n      \"InvoiceID\": \"0dadcbc6-2abb-47e0-8535-8849b9c5ad88\",\n      \"Status\": \"SUBMITTED\",\n      \"DueDate\": \"2025-12-10\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        832,
+        240
+      ],
+      "id": "448901b6-b0d0-45cc-a94a-df2c4848e251",
+      "name": "Make Invoice Sent1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.xero.com/api.xro/2.0/Invoices",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "xeroOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "value": "16ef3553-1ccc-4b16-b9cd-8dd77f822653"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"Invoices\": [\n    {\n      \"InvoiceID\": \"{{ $('Create 30% Invoice').item.json.InvoiceID }}\",\n      \"Status\": \"AUTHORISED\",\n      \"DueDate\": \"{{ \n        (() => {\n          const dateStr = $('XERO : Get Quote').item.json.Quotes[0].DateString.split('T')[0];\n          const baseDate = new Date(dateStr);\n          const due = new Date(baseDate.getTime() + 14 * 24 * 60 * 60 * 1000);\n          return due.toISOString().split('T')[0];\n        })()\n      }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        832,
+        48
+      ],
+      "id": "bac09bb7-27f3-4210-95de-ba7cdc2390e3",
+      "name": "Make Invoice Submitted",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2320,
+        368
+      ],
+      "id": "c7ae00c9-d686-4547-aeff-7bc62cd577a8",
+      "name": "OpenRouter Chat Model"
+    }
+  ],
+  "pinData": {
+    "Microsoft Outlook Trigger": [
+      {
+        "json": {
+          "id": "AQMkADcwYTBkYTg1LTQyOGQtNDk3My1iMzdlLTQwYzNmNDI1YmFmZABGAAADWnrItVZ__UCs2R3iiu0PWQcAs9iPDrKKX02YbbxxtxYp3gAAAgEMAAAAs9iPDrKKX02YbbxxtxYp3gAKFWUDMwAAAA==",
+          "conversationId": "AAQkADcwYTBkYTg1LTQyOGQtNDk3My1iMzdlLTQwYzNmNDI1YmFmZAAQABQddD2MqGNMgcdt8ODIPr8=",
+          "subject": "Re: quote",
+          "bodyPreview": "please proceed\r\n\r\nBest Regards\r\n\r\nIan\r\n\r\nIan Paltiel\r\nCommercial Director\r\nInternet Creation Ltd.\r\nT: 01383 820311\r\nM: 07988899521\r\nW: www.internetcreation.net\r\n\r\nAWARDS\r\nWinner of the Best Creative Web Design 2008 and Creative Business of the year 2008",
+          "from": "ian141270@googlemail.com",
+          "to": [
+            "info@internetcreation.net"
+          ],
+          "categories": [],
+          "hasAttachments": false
+        }
+      },
+      {
+        "json": {
+          "id": "AQMkADcwYTBkYTg1LTQyOGQtNDk3My1iMzdlLTQwYzNmNDI1YmFmZABGAAADWnrItVZ__UCs2R3iiu0PWQcAs9iPDrKKX02YbbxxtxYp3gAAAgEbAAAAs9iPDrKKX02YbbxxtxYp3gAKFWU3-QAAAA==",
+          "conversationId": "AAQkADcwYTBkYTg1LTQyOGQtNDk3My1iMzdlLTQwYzNmNDI1YmFmZAAQAIKSFSJhlvBLg0Lb11wubrk=",
+          "subject": "Re: Yes.......",
+          "bodyPreview": "Hi,\r\n\r\nI was checking your website and see you have a good design and it looks great,\r\n\r\nbut it’s not ranking on Google and other major search engine.\r\n\r\nWe can place your website on Google's first page.\r\n\r\nMay I send an SEO proposal and price?\r\n\r\nRegards",
+          "from": "www.seoexperts05@outlook.com",
+          "to": [],
+          "categories": [],
+          "hasAttachments": false
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Create a card": {
+      "main": [
+        [
+          {
+            "node": "Append Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft Outlook Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact": {
+      "main": [
+        [
+          {
+            "node": "XERO : Get Quote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XERO : Get Quote": {
+      "main": [
+        [
+          {
+            "node": "Make Quote Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate 30% Invoice": {
+      "main": [
+        [
+          {
+            "node": "Create 30% Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create 30% Invoice": {
+      "main": [
+        [
+          {
+            "node": "Get Invoice File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Invoice": {
+      "main": [
+        [
+          {
+            "node": "Make Invoice Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Check Client's Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Client's Email.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Client's Email": {
+      "main": [
+        [
+          {
+            "node": "Email Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team": {
+      "main": [
+        [
+          {
+            "node": "Get Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Found?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Found?.": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Notify Team.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get messages ": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Client's Email.": {
+      "main": [
+        [
+          {
+            "node": "Email Found?.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Data": {
+      "main": [
+        [
+          {
+            "node": "Check Invoice",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Start Invoice Reminder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Start DQ Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Invoice File": {
+      "main": [
+        [
+          {
+            "node": "Make Invoice PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make Invoice PDF": {
+      "main": [
+        [
+          {
+            "node": "Send Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make Quote Accepted": {
+      "main": [
+        [
+          {
+            "node": "Calculate 30% Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make Invoice Submitted": {
+      "main": [
+        [
+          {
+            "node": "Create a card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "07a80bd1-896b-48f6-a880-d9398daf031d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2e806d8e779904fee169c37d64bf24a4176529c6bae3ae97397462d403b79ca2"
+  },
+  "id": "ZxKFHBRQ89AA64n4",
+  "tags": []
+}

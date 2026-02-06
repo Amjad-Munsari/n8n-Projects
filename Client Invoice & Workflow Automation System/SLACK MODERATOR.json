@@ -1,0 +1,618 @@
+{
+  "name": "Slack Moderator",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Get List').item.json.name }}",
+                    "rightValue": "Home Page Design Feedback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c3251c7b-1d2d-4929-b5d1-714d8ecc855b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "HP Design"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9ea65800-d1b1-475e-89ee-ffe362eaf323",
+                    "leftValue": "={{ $('Get List').item.json.name }}",
+                    "rightValue": "Other Pages Design Feedback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Final Design"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "09ece00c-17ac-418f-8140-4158f1677a99",
+                    "leftValue": "={{ $('Get List').item.json.name }}",
+                    "rightValue": "Client Sign Off",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Final Website"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2128,
+        -288
+      ],
+      "id": "342fb322-25e1-4d1a-9853-b19569b52b2e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/final-design-webhook",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Name",
+              "value": "={{ $json.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1904,
+        -272
+      ],
+      "id": "ef4cf4a3-8768-4e22-83b8-6dfe35c0192a",
+      "name": "Start Final Design Workflow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/start-home-page",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Name",
+              "value": "={{ $json.name }}"
+            },
+            {
+              "name": "Description",
+              "value": "={{ $json.desc }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1904,
+        -464
+      ],
+      "id": "7c591dc9-4e16-4c29-93d7-8c22983813d9",
+      "name": "Start HP Design Worflow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yoai.app.n8n.cloud/webhook/start-final-website",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Name",
+              "value": "={{ $json.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1904,
+        -80
+      ],
+      "id": "eb3811cf-b5f3-4101-89ad-be80a0ba12cb",
+      "name": "Start Final Website Workflow"
+    },
+    {
+      "parameters": {
+        "trigger": [
+          "any_event"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C09RA4P6118",
+          "mode": "list",
+          "cachedResultName": "all-n8n-automation"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3472,
+        -352
+      ],
+      "id": "eabe25e7-6767-42ba-a385-10110965a369",
+      "name": "Slack Notification",
+      "webhookId": "6a70daad-606b-4aee-8a74-fd6961470f8a"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function to extract destination list name from fallback text\nfunction extractDestinationList(fallbackText) {\n  // Pattern: \"from [source list] to [destination list].\"\n  const match = fallbackText.match(/from .+ to (.+)\\.$/i);\n  \n  if (match && match[1]) {\n    return match[1].trim();\n  }\n  \n  return null;\n}\n\n// Replace 'yourInputVariable' with your actual input variable name\nconst fallback = $input.first().json.attachments[0].fallback;\n\n// Get the destination list name\nconst listName = extractDestinationList(fallback);\n\n// Return as an array of objects (required format)\nreturn [\n  {\n    destinationList: listName,\n    originalFallback: fallback\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3248,
+        -352
+      ],
+      "id": "267959df-a6c2-46fb-8e9d-f6b6721e8d24",
+      "name": "Extract List Name"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function to extract client name from fallback text\nfunction extractClientName(fallbackText) {\n  // Pattern: \"moved the card [Name] from\"\n  const match = fallbackText.match(/moved the card (.+?) from/i);\n  \n  if (match && match[1]) {\n    return match[1].trim();\n  }\n  \n  return null;\n}\n\n// Replace 'yourInputVariable' with your actual input variable name\nconst fallback = $input.first().json.originalFallback;\n\n// Get the client name\nconst clientName = extractClientName(fallback);\n\n// Return as an array of objects (required format)\nreturn [\n  {\n    clientName: clientName,\n    originalFallback: fallback\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2592,
+        -352
+      ],
+      "id": "84bbded8-9a12-42d5-9ded-6f3bbe32c06e",
+      "name": "Extract Client's Name"
+    },
+    {
+      "parameters": {
+        "resource": "list",
+        "operation": "getAll",
+        "id": "68c7d7c3a975bad82cd6b8b4",
+        "additionalFields": {
+          "fields": "name"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        -3248,
+        -208
+      ],
+      "id": "bd809b2d-e584-4593-b8b5-9bed82267ce0",
+      "name": "Get many lists"
+    },
+    {
+      "parameters": {
+        "resource": "list",
+        "operation": "getCards",
+        "id": "={{ $json.id }}",
+        "returnAll": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        -2816,
+        -208
+      ],
+      "id": "f488f434-f8ba-4d4c-9e8c-2f17a645126b",
+      "name": "Get all cards in a list"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5fed440e-6301-4a12-9111-a1fc35af9f55",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "={{ $('Extract List Name').item.json.destinationList }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -3040,
+        -208
+      ],
+      "id": "61d41f09-1398-4550-978f-57c711e1b572",
+      "name": "Get List"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "91fc399f-9376-4726-81d5-49f77a789df8",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "={{ $('Extract Client\\'s Name').item.json.clientName }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -2592,
+        -208
+      ],
+      "id": "f558b4f4-44a5-44cc-9310-8c0b81d34a9d",
+      "name": "Get Card"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "26f7971f-ed70-4d72-93d0-36435a72e351",
+              "leftValue": "={{ $json.idList }}",
+              "rightValue": "={{ $('Get List').item.json.id }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2352,
+        -272
+      ],
+      "id": "4e3e9d36-fe12-433e-864d-b06807ea1dc1",
+      "name": "Card still in List?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f8cefe9f-bcbd-41f5-b8a4-b5185fb6f02e",
+              "leftValue": "={{ $json.destinationList }}",
+              "rightValue": "Home Page Design Feedback",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "a2928b1c-7371-4b06-9303-931e34d37e3f",
+              "leftValue": "={{ $json.destinationList }}",
+              "rightValue": "Other Pages Design Feedback",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "4ff507d1-a39f-4086-8c3b-6665b6c30939",
+              "leftValue": "={{ $json.destinationList }}",
+              "rightValue": "Client Sign Off",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3040,
+        -352
+      ],
+      "id": "9fab4f35-0edb-4f20-b911-9eeeaf3fdb80",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2816,
+        -352
+      ],
+      "id": "59b3dfcb-c046-4c2d-9717-6f0f492a8211",
+      "name": "Wait 5 minutes",
+      "webhookId": "1ca2dc0b-abb2-4d84-88fb-86c8569a86c3"
+    }
+  ],
+  "pinData": {
+    "Slack Notification": [
+      {
+        "json": {
+          "type": "message",
+          "user": "U09RQCHB1JN",
+          "ts": "1765211338.698359",
+          "bot_id": "B09R8UG8V2T",
+          "app_id": "A074YH40Z",
+          "text": "",
+          "team": "T09S4DH44SC",
+          "bot_profile": {
+            "id": "B09R8UG8V2T",
+            "deleted": false,
+            "name": "Trello",
+            "updated": 1762641636,
+            "app_id": "A074YH40Z",
+            "user_id": "U09RQCHB1JN",
+            "icons": {
+              "image_36": "https://avatars.slack-edge.com/2021-07-19/2282472048054_9a51d280179d828b3ad7_36.png",
+              "image_48": "https://avatars.slack-edge.com/2021-07-19/2282472048054_9a51d280179d828b3ad7_48.png",
+              "image_72": "https://avatars.slack-edge.com/2021-07-19/2282472048054_9a51d280179d828b3ad7_72.png"
+            },
+            "team_id": "T09S4DH44SC"
+          },
+          "attachments": [
+            {
+              "id": 1,
+              "fallback": "Ian Paltiel moved the card ian paltiel (gmail) from Build to Client Sign Off.",
+              "text": "Moved *<https://trello.com/c/8gmyUcVW|ian paltiel (gmail)>* from *Build* to *Client Sign Off*.",
+              "author_name": "Ian Paltiel",
+              "author_link": "https://trello.com/ianpaltiel",
+              "author_icon": "https://trello-members.s3.amazonaws.com/545ba2db1410a8ebac6f7801/d805a2ec9af2db86b81304f76719d302/30.png",
+              "mrkdwn_in": [
+                "pretext",
+                "text"
+              ]
+            }
+          ],
+          "channel": "C09RA4P6118",
+          "event_ts": "1765211338.698359",
+          "channel_type": "channel"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Start HP Design Worflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start Final Design Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start Final Website Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "Extract List Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract List Name": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Client's Name": {
+      "main": [
+        [
+          {
+            "node": "Get many lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many lists": {
+      "main": [
+        [
+          {
+            "node": "Get List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all cards in a list": {
+      "main": [
+        [
+          {
+            "node": "Get Card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get List": {
+      "main": [
+        [
+          {
+            "node": "Get all cards in a list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Card": {
+      "main": [
+        [
+          {
+            "node": "Card still in List?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Card still in List?": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Wait 5 minutes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 minutes": {
+      "main": [
+        [
+          {
+            "node": "Extract Client's Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6ada2280-354b-4c4f-bcff-c133ac19fba7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2e806d8e779904fee169c37d64bf24a4176529c6bae3ae97397462d403b79ca2"
+  },
+  "id": "2lanud7bsFHXLgw4",
+  "tags": []
+}

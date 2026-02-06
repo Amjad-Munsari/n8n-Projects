@@ -1,0 +1,131 @@
+{
+  "name": "STEP 1 - Start Design Phase & Notify Team",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "design-phase",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6196f09e-7c2b-4a04-8689-308f58ad53fe",
+      "name": "Webhook",
+      "webhookId": "d6d69f18-c335-418f-950d-3be1634120c7"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": {
+          "__rl": true,
+          "value": "={{ $json.query['Trello Card ID'] }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "idList": "68c7d7f19e056e27e6c29b94"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "307d1641-f535-4e8a-b161-4d3b07c69438",
+      "name": "Move Card to \"Home Page Design\""
+    },
+    {
+      "parameters": {
+        "toRecipients": "ian@internetcreation.net,mike@internetcreation.net",
+        "subject": "Start Design Phase",
+        "bodyContent": "=The Client {{ $('Webhook').item.json.query.Name }} has paid the first invoice & submitted the design questionnaire. It's time to start the design phase!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "90d313bb-4e11-441d-8fd3-9b6e1333f1b1",
+      "name": "Notify Team",
+      "webhookId": "59c4e282-9321-4f19-8def-455bc2c55094"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a3adaf75316d29c-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 172.71.164.170",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-mcc62",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "Trello Card ID": "6924a1bbbfd339171b940cf6",
+            "Name": "Amjad",
+            "Email": "amjadmunsari@gmail.com"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/design-phase",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Move Card to \"Home Page Design\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Card to \"Home Page Design\"": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dcfd8b7d-f2cb-479c-98dd-a8e3f472821d",
+  "meta": {
+    "instanceId": "2e806d8e779904fee169c37d64bf24a4176529c6bae3ae97397462d403b79ca2"
+  },
+  "id": "7a6jMcNA66jepw27",
+  "tags": []
+}

@@ -1,0 +1,130 @@
+{
+  "name": "STEP 4 - Start Building Phase & Notify Team",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "start-building-phase",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "119fbc84-0f91-4739-a85a-ac533c7a9ab7",
+      "name": "Webhook",
+      "webhookId": "54c03b52-867d-42a1-8710-049f6231a376"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": {
+          "__rl": true,
+          "value": "={{ $json.query.Trello_Card_ID }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "idList": "68c7d80ffbdaa79c77450c8b"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "45d07c11-d199-4317-add6-449d7cb1557d",
+      "name": "Move Card to Building List"
+    },
+    {
+      "parameters": {
+        "toRecipients": "ian@internetcreation.net,mike@internetcreation.net",
+        "subject": "Start Building Phase",
+        "bodyContent": "=The Client {{ $('Webhook').item.json.query.Email }} has paid the second invoice. It's time to start the building phase!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c734fe36-0aa0-4c9a-a757-b223a40c3af5",
+      "name": "Notify Team",
+      "webhookId": "6bdd7906-f526-4777-990b-b804932489aa"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "yoai.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "0",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.174.4",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a3c520e87ab7aef-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "x-forwarded-for": "20.218.174.4, 172.70.248.16",
+            "x-forwarded-host": "yoai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-75-7cf7798779-jd56b",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.174.4"
+          },
+          "params": {},
+          "query": {
+            "Trello_Card_ID": "6924d6584bd292df31442c06",
+            "Email": "amjadmunsari@gmail.com"
+          },
+          "body": {},
+          "webhookUrl": "https://yoai.app.n8n.cloud/webhook/start-building-phase",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Move Card to Building List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Card to Building List": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c667b891-fc1a-447f-947b-6a77cf11216b",
+  "meta": {
+    "instanceId": "2e806d8e779904fee169c37d64bf24a4176529c6bae3ae97397462d403b79ca2"
+  },
+  "id": "RoXvqcaJxHZKHwSH",
+  "tags": []
+}
